@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #FAFAF7;
+  --color-ink: #111111;
+  --color-stone-line: #E7E5E0;
+  --color-stone-soft: #F1EFEA;
+  --color-muted: #6B6B66;
+  --color-accent: #FF4F1F;
+  --color-accent-dark: #E03E10;
+  --font-display: "Bricolage Grotesque", sans-serif;
+  --font-body: "Manrope", sans-serif;
+}
+
+body { background-color: var(--color-paper); color: var(--color-ink); font-family: var(--font-body); }
+h1, h2, h3, h4 { font-family: var(--font-display); }
