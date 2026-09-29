@@ -4,6 +4,8 @@ import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import connectDB from './config/db.js'
+import cookieParser from 'cookie-parser'
+import authRoutes from './routes/authRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -11,6 +13,9 @@ connectDB()
 const app = express()
 app.use(cors())
 app.use(express.json())
+
+app.use(cookieParser())
+app.use('/api/auth', authRoutes)
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }))
 
