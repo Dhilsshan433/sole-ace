@@ -1,0 +1,12 @@
+export const products = [
+  { id: 1, name: 'Air Runner 90', brand: 'Nimbus', category: 'Sneakers', price: 5999, oldPrice: 7499, rating: 4.6, sizes: [6,7,8,9,10,11], colors: ['#111111','#E7E5E0','#FF4F1F','#3B5B7A'], image: 'https://placehold.co/600x600/F1EFEA/111111?text=Air+Runner+90', description: 'A lightweight everyday runner with a breathable knit upper and a cushioned sole built for long comfortable days.' },
+  { id: 2, name: 'Street Low', brand: 'Stride', category: 'Sneakers', price: 4299, rating: 4.3, sizes: [6,7,8,9,10], colors: ['#111111','#FFFFFF'], image: 'https://placehold.co/600x600/F1EFEA/111111?text=Street+Low', description: 'Clean, minimal street sneaker built for everyday wear.' },
+  { id: 3, name: 'Trail Pro', brand: 'Nimbus', category: 'Running', price: 6799, oldPrice: 8199, rating: 4.7, sizes: [7,8,9,10,11], colors: ['#111111','#556B2F'], image: 'https://placehold.co/600x600/F1EFEA/111111?text=Trail+Pro', description: 'Rugged grip and extra cushioning for off-road running.' },
+  { id: 4, name: 'Oxford Classic', brand: 'Oak & Co', category: 'Formal', price: 7499, rating: 4.5, sizes: [7,8,9,10], colors: ['#111111','#5C3A21'], image: 'https://placehold.co/600x600/F1EFEA/111111?text=Oxford+Classic', description: 'A timeless formal oxford, hand-finished leather upper.' },
+  { id: 5, name: 'Court Vision', brand: 'Stride', category: 'Sneakers', price: 4999, oldPrice: 5999, rating: 4.4, sizes: [6,7,8,9], colors: ['#FFFFFF','#FF4F1F'], image: 'https://placehold.co/600x600/F1EFEA/111111?text=Court+Vision', description: 'Retro court styling with modern comfort foam.' },
+  { id: 6, name: 'Cloud Walker', brand: 'Nimbus', category: 'Running', price: 3999, rating: 4.2, sizes: [6,7,8,9,10], colors: ['#111111'], image: 'https://placehold.co/600x600/F1EFEA/111111?text=Cloud+Walker', description: 'Ultra-light everyday walking shoe.' },
+  { id: 7, name: 'Chelsea Boot', brand: 'Oak & Co', category: 'Boots', price: 8299, oldPrice: 9499, rating: 4.6, sizes: [8,9,10,11], colors: ['#111111'], image: 'https://placehold.co/600x600/F1EFEA/111111?text=Chelsea+Boot', description: 'Classic Chelsea boot in premium leather.' },
+  { id: 8, name: 'Slide Comfort', brand: 'Stride', category: 'Sandals', price: 1999, rating: 4.1, sizes: [7,8,9,10], colors: ['#111111','#3B5B7A'], image: 'https://placehold.co/600x600/F1EFEA/111111?text=Slide+Comfort', description: 'Soft footbed slides for home and short trips.' },
+]
+
+export const getProduct = (id) => products.find((p) => p.id === Number(id))

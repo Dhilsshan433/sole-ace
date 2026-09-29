@@ -13,12 +13,34 @@ import ForgotPassword from './pages/user/ForgotPassword'
 import ResetOtp from './pages/user/ResetOtp'
 import ResetPassword from './pages/user/ResetPassword'
 import ResetSuccess from './pages/user/ResetSuccess'
+import Home from './pages/user/Home'
+import Landing from './pages/user/Landing'
+import ProductListing from './pages/user/ProductListing'
+import ProductDetail from './pages/user/ProductDetail'
+import Cart from './pages/user/Cart'
+import Checkout from './pages/user/Checkout'
+import OrderSuccess from './pages/user/OrderSuccess'
+import OrderFailed from './pages/user/OrderFailed'
+import OrderSummary from './pages/user/OrderSummary'
+import OrderTracking from './pages/user/OrderTracking'
+import OrderPlaced from './pages/user/OrderPlaced'
 
 export default function App() {
   return (
     <Routes>
       <Route element={<UserLayout />}>
         <Route path="/" element={<Preview />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/landing" element={<Landing />} />
+        <Route path="/shop" element={<ProductListing />} />
+        <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/order/success" element={<OrderSuccess />} />
+        <Route path="/order/failed" element={<OrderFailed />} />
+        <Route path="/order/summary" element={<OrderSummary />} />
+        <Route path="/order/tracking" element={<OrderTracking />} />
+        <Route path="/order/placed" element={<OrderPlaced />} />
       </Route>
 
       <Route element={<AuthLayout />}>
