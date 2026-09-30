@@ -2,15 +2,20 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import Button from '../../components/Button'
 import { useCart } from '../../context/CartContext'
+import { useAuth } from '../../context/AuthContext'
 import api from '../../api/axios'
 
 export default function Checkout() {
   const { items, subtotal, clearCart } = useCart()
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [payment, setPayment] = useState('upi')
   const [placing, setPlacing] = useState(false)
 
+  const defaultAddress = user?.addresses?.find((a) => a.isDefault) || user?.addresses?.[0]
+
   const placeOrder = async () => {
+    if (!defaultAddress) return
     setPlacing(true)
     try {
       const payload = {
@@ -23,12 +28,12 @@ export default function Checkout() {
           qty: i.qty,
         })),
         address: {
-          fullName: 'Alex Morgan',
-          phone: '+919876543210',
-          line1: '12 Lake View Road, Tiruvalla',
-          city: 'Tiruvalla',
-          state: 'Kerala',
-          pincode: '689101',
+          fullName: defaultAddress.fullName,
+          phone: defaultAddress.phone,
+          line1: defaultAddress.line1,
+          city: defaultAddress.city,
+          state: defaultAddress.state,
+          pincode: defaultAddress.pincode,
         },
         paymentMethod: payment,
       }
@@ -49,15 +54,23 @@ export default function Checkout() {
         <div className="space-y-6">
           <section className="rounded-2xl border border-stone-line p-6">
             <h2 className="mb-3 font-semibold">1. Delivery address</h2>
-            <label className="flex items-start gap-3 rounded-xl border border-accent bg-orange-50 p-4">
-              <input type="radio" checked readOnly className="mt-1" />
-              <span>
-                <b>Alex Morgan · Home</b>
-                <br />
-                <span className="text-sm text-muted">12 Lake View Road, Tiruvalla, Kerala 689101</span>
-              </span>
-            </label>
-            <Button variant="outline" className="mt-3">Add new address</Button>
+            {defaultAddress ? (
+              <label className="flex items-start gap-3 rounded-xl border border-accent bg-orange-50 p-4">
+                <input type="radio" checked readOnly className="mt-1" />
+                <span>
+                  <b>{defaultAddress.fullName} · {defaultAddress.label}</b>
+                  <br />
+                  <span className="text-sm text-muted">
+                    {defaultAddress.line1}, {defaultAddress.city}, {defaultAddress.state} {defaultAddress.pincode}
+                  </span>
+                </span>
+              </label>
+            ) : (
+              <p className="text-sm text-muted">No saved address yet — add one to continue.</p>
+            )}
+            <Button variant="outline" className="mt-3" onClick={() => navigate('/profile/addresses')}>
+              {defaultAddress ? 'Add new address' : 'Add an address'}
+            </Button>
           </section>
 
           <section className="rounded-2xl border border-stone-line p-6">
@@ -96,7 +109,7 @@ export default function Checkout() {
             <span>Total</span>
             <span>₹{subtotal.toLocaleString('en-IN')}</span>
           </div>
-          <Button full onClick={placeOrder} disabled={placing || items.length === 0}>
+          <Button full onClick={placeOrder} disabled={placing || items.length === 0 || !defaultAddress}>
             {placing ? 'Placing order…' : 'Place order'}
           </Button>
         </div>
