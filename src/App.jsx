@@ -4,7 +4,9 @@ import { Routes, Route } from 'react-router-dom'
 import UserLayout from './layouts/UserLayout'
 import AuthLayout from './layouts/AuthLayout'
 import ProfileLayout from './layouts/ProfileLayout'
+import AdminLayout from './layouts/AdminLayout'
 import RequireAuth from './components/RequireAuth'
+import RequireAdmin from './components/RequireAdmin'
 
 // Auth pages
 import Login from './pages/user/Login'
@@ -51,6 +53,16 @@ import Support from './pages/user/Support'
 import SomethingWrong from './pages/user/SomethingWrong'
 import FeatureNotAvailable from './pages/user/FeatureNotAvailable'
 import NotFound from './pages/user/NotFound'
+
+// Admin pages
+import AdminLogin from './pages/admin/AdminLogin'
+import Dashboard from './pages/admin/Dashboard'
+import AdminUsers from './pages/admin/Users'
+import AdminProducts from './pages/admin/Products'
+import AdminCategories from './pages/admin/Categories'
+import AdminBrands from './pages/admin/Brands'
+import AdminOrders from './pages/admin/Orders'
+import AdminOrderDetails from './pages/admin/OrderDetails'
 
 export default function App() {
   return (
@@ -109,6 +121,25 @@ export default function App() {
         <Route path="/reset/otp" element={<ResetOtp />} />
         <Route path="/reset/password" element={<ResetPassword />} />
         <Route path="/reset/success" element={<ResetSuccess />} />
+      </Route>
+
+      {/* Admin panel */}
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route
+        path="/admin"
+        element={
+          <RequireAdmin>
+            <AdminLayout />
+          </RequireAdmin>
+        }
+      >
+        <Route index element={<Dashboard />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="products" element={<AdminProducts />} />
+        <Route path="categories" element={<AdminCategories />} />
+        <Route path="brands" element={<AdminBrands />} />
+        <Route path="orders" element={<AdminOrders />} />
+        <Route path="orders/:id" element={<AdminOrderDetails />} />
       </Route>
 
       {/* 404 — must stay last */}
