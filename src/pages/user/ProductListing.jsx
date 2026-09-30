@@ -1,16 +1,25 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import ProductCard from '../../components/ProductCard'
 import { useProducts } from '../../hooks/useProducts'
-
-const categories = ['Sneakers', 'Running', 'Formal', 'Sandals', 'Boots']
-const brands = ['Nimbus', 'Stride', 'Oak & Co']
+import api from '../../api/axios'
 
 export default function ProductListing() {
   const [params] = useSearchParams()
-  const [category, setCategory] = useState(params.get('category') || '')
+  const [categories, setCategories] = useState([])
+  const [brands, setBrands] = useState([])
+  const [category, setCategory] = useState('')
   const [brand, setBrand] = useState('')
   const { products, loading } = useProducts({ category, brand })
+
+  useEffect(() => {
+    api.get('/categories').then((res) => {
+      setCategories(res.data)
+      const match = res.data.find((c) => c.name === params.get('category'))
+      if (match) setCategory(match._id)
+    })
+    api.get('/brands').then((res) => setBrands(res.data))
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -26,8 +35,8 @@ export default function ProductListing() {
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm"><input type="radio" checked={category === ''} onChange={() => setCategory('')} /> All</label>
               {categories.map((c) => (
-                <label key={c} className="flex items-center gap-2 text-sm">
-                  <input type="radio" checked={category === c} onChange={() => setCategory(c)} /> {c}
+                <label key={c._id} className="flex items-center gap-2 text-sm">
+                  <input type="radio" checked={category === c._id} onChange={() => setCategory(c._id)} /> {c.name}
                 </label>
               ))}
             </div>
@@ -37,8 +46,8 @@ export default function ProductListing() {
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm"><input type="radio" checked={brand === ''} onChange={() => setBrand('')} /> All</label>
               {brands.map((b) => (
-                <label key={b} className="flex items-center gap-2 text-sm">
-                  <input type="radio" checked={brand === b} onChange={() => setBrand(b)} /> {b}
+                <label key={b._id} className="flex items-center gap-2 text-sm">
+                  <input type="radio" checked={brand === b._id} onChange={() => setBrand(b._id)} /> {b.name}
                 </label>
               ))}
             </div>
