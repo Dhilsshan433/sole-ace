@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url'
 import connectDB from './config/db.js'
 import cookieParser from 'cookie-parser'
 import authRoutes from './routes/authRoutes.js'
+import productRoutes from './routes/productRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -16,6 +17,7 @@ app.use(express.json())
 
 app.use(cookieParser())
 app.use('/api/auth', authRoutes)
+app.use('/api/products', productRoutes)
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }))
 

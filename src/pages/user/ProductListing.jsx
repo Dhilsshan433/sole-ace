@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import ProductCard from '../../components/ProductCard'
-import { products } from '../../data/products'
+import { useProducts } from '../../hooks/useProducts'
 
 const categories = ['Sneakers', 'Running', 'Formal', 'Sandals', 'Boots']
 const brands = ['Nimbus', 'Stride', 'Oak & Co']
@@ -10,17 +10,14 @@ export default function ProductListing() {
   const [params] = useSearchParams()
   const [category, setCategory] = useState(params.get('category') || '')
   const [brand, setBrand] = useState('')
-
-  const filtered = useMemo(() => products.filter((p) =>
-    (!category || p.category === category) && (!brand || p.brand === brand)
-  ), [category, brand])
+  const { products, loading } = useProducts({ category, brand })
 
   return (
     <div className="space-y-6">
       <p className="text-sm text-muted">Home / Shop</p>
       <div className="flex items-center justify-between">
         <h1 className="text-4xl font-bold">All shoes</h1>
-        <span className="text-sm text-muted">{filtered.length} products</span>
+        <span className="text-sm text-muted">{products.length} products</span>
       </div>
       <div className="flex flex-col gap-10 md:flex-row">
         <aside className="w-full shrink-0 space-y-7 md:w-56">
@@ -48,8 +45,9 @@ export default function ProductListing() {
           </div>
         </aside>
         <div className="grid flex-1 grid-cols-2 gap-6 sm:grid-cols-3">
-          {filtered.map((p) => <ProductCard key={p.id} product={p} />)}
-          {filtered.length === 0 && <p className="col-span-full text-muted">No products match these filters.</p>}
+          {loading && <p className="col-span-full text-muted">Loading…</p>}
+          {!loading && products.map((p) => <ProductCard key={p._id} product={p} />)}
+          {!loading && products.length === 0 && <p className="col-span-full text-muted">No products match these filters.</p>}
         </div>
       </div>
     </div>

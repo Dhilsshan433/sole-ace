@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
 import Button from '../../components/Button'
 import ProductCard from '../../components/ProductCard'
-import { products } from '../../data/products'
+import { useProducts } from '../../hooks/useProducts'
 
+const { products } = useProducts()
 const categories = ['Sneakers', 'Running', 'Formal', 'Sandals', 'Boots', 'Kids']
 
 export default function Home() {

@@ -3,37 +3,39 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Heart } from 'lucide-react'
 import Button from '../../components/Button'
 import ProductCard from '../../components/ProductCard'
-import { getProduct, products } from '../../data/products'
+import { useProduct } from '../../hooks/useProduct'
 import { useCart } from '../../context/CartContext'
 
 export default function ProductDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const product = getProduct(id)
+  const { product, related, loading } = useProduct(id)
   const { addItem } = useCart()
-  const [size, setSize] = useState(product?.sizes?.[0])
+  const [size, setSize] = useState(null)
   const [qty, setQty] = useState(1)
 
+  if (loading) return <p>Loading…</p>
   if (!product) return <p>Product not found.</p>
 
-  const related = products.filter((p) => p.id !== product.id).slice(0, 4)
+  const sizes = [...new Set(product.variants.map((v) => v.size))].sort((a, b) => a - b)
+  const activeSize = size ?? sizes[0]
 
   const handleAdd = () => {
-    addItem(product, size, qty)
+    addItem({ id: product._id, name: product.name, price: product.price, image: product.images[0] }, activeSize, qty)
     navigate('/cart')
   }
 
   return (
     <div className="space-y-12">
-      <p className="text-sm text-muted">Home / Shop / {product.category} / {product.name}</p>
+      <p className="text-sm text-muted">Home / Shop / {product.category?.name} / {product.name}</p>
       <div className="grid gap-14 md:grid-cols-2">
         <div className="aspect-square overflow-hidden rounded-2xl bg-stone-soft">
-          <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+          <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
         </div>
         <div className="space-y-5">
-          <p className="text-sm text-muted">{product.brand}</p>
+          <p className="text-sm text-muted">{product.brand?.name}</p>
           <h1 className="text-4xl font-bold">{product.name}</h1>
-          <p className="text-sm">★ {product.rating} · 128 reviews</p>
+          <p className="text-sm">★ {product.rating} · {product.reviewCount} reviews</p>
           <div className="flex items-baseline gap-3">
             <span className="text-3xl font-bold">₹{product.price.toLocaleString('en-IN')}</span>
             {product.oldPrice && <span className="text-muted line-through">₹{product.oldPrice.toLocaleString('en-IN')}</span>}
@@ -50,9 +52,9 @@ export default function ProductDetail() {
           <div>
             <p className="mb-2 text-sm font-semibold">Size</p>
             <div className="flex flex-wrap gap-2">
-              {product.sizes.map((s) => (
+              {sizes.map((s) => (
                 <button key={s} onClick={() => setSize(s)}
-                  className={`rounded-xl px-4 py-2 text-sm font-medium ${size === s ? 'bg-ink text-white' : 'border border-stone-line'}`}>
+                  className={`rounded-xl px-4 py-2 text-sm font-medium ${activeSize === s ? 'bg-ink text-white' : 'border border-stone-line'}`}>
                   {s}
                 </button>
               ))}
@@ -76,12 +78,14 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      <section>
-        <h2 className="mb-5 text-2xl font-bold">You may also like</h2>
-        <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-          {related.map((p) => <ProductCard key={p.id} product={p} />)}
-        </div>
-      </section>
+      {related.length > 0 && (
+        <section>
+          <h2 className="mb-5 text-2xl font-bold">You may also like</h2>
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+            {related.map((p) => <ProductCard key={p._id} product={p} />)}
+          </div>
+        </section>
+      )}
     </div>
   )
 }
