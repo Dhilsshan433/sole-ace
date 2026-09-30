@@ -3,16 +3,27 @@ import { useState } from 'react'
 import AuthCard from '../../components/AuthCard'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
+import api from '../../api/axios'
+import { useAuth } from '../../context/AuthContext'
 
 export default function Login() {
   const navigate = useNavigate()
+  const { setUser } = useAuth()
   const [form, setForm] = useState({ email: '', password: '' })
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: call POST /api/auth/login
-    const ok = true // placeholder
-    navigate(ok ? '/login/success' : '/login/failed')
+    setLoading(true)
+    try {
+      const res = await api.post('/auth/login', form)
+      setUser(res.data.user)
+      navigate('/login/success')
+    } catch (err) {
+      navigate('/login/failed')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -26,7 +37,7 @@ export default function Login() {
           <label className="flex items-center gap-2"><input type="checkbox" /> Remember me</label>
           <Link to="/forgot-password" className="font-semibold text-accent">Forgot password?</Link>
         </div>
-        <Button type="submit" full>Log in</Button>
+        <Button type="submit" full disabled={loading}>{loading ? 'Logging in…' : 'Log in'}</Button>
       </form>
       <p className="text-center text-sm text-muted">
         New to SOLE ACE? <Link to="/signup" className="font-semibold text-accent">Sign up</Link>

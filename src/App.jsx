@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom'
 import UserLayout from './layouts/UserLayout'
 import AuthLayout from './layouts/AuthLayout'
 import ProfileLayout from './layouts/ProfileLayout'
+import RequireAuth from './components/RequireAuth'
 
 // Auth pages
 import Login from './pages/user/Login'
@@ -74,7 +75,14 @@ export default function App() {
         <Route path="/error" element={<SomethingWrong />} />
         <Route path="/unavailable" element={<FeatureNotAvailable />} />
 
-        <Route path="/profile" element={<ProfileLayout />}>
+        <Route
+          path="/profile"
+          element={
+            <RequireAuth>
+              <ProfileLayout />
+            </RequireAuth>
+          }
+        >
           <Route index element={<PersonalInfo />} />
           <Route path="addresses" element={<Addresses />} />
           <Route path="reviews" element={<Reviews />} />

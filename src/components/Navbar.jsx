@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom'
 import { Search, Heart, ShoppingBag, User } from 'lucide-react'
 import Logo from './Logo'
+import { useAuth } from '../context/AuthContext'
 
 const links = [
   { to: '/shop', label: 'Shop' },
@@ -10,6 +11,8 @@ const links = [
 ]
 
 export default function Navbar() {
+  const { user, logout } = useAuth()
+
   return (
     <header className="sticky top-0 z-40 border-b border-stone-line bg-paper/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
@@ -26,7 +29,13 @@ export default function Navbar() {
           <Link to="/shop" className="rounded-lg p-2 hover:bg-stone-soft"><Search size={20} /></Link>
           <Link to="/profile/wishlist" className="rounded-lg p-2 hover:bg-stone-soft"><Heart size={20} /></Link>
           <Link to="/cart" className="rounded-lg p-2 hover:bg-stone-soft"><ShoppingBag size={20} /></Link>
-          <Link to="/login" className="rounded-lg p-2 hover:bg-stone-soft"><User size={20} /></Link>
+          {user ? (
+            <button onClick={logout} className="rounded-lg p-2 hover:bg-stone-soft" title="Log out">
+              <User size={20} />
+            </button>
+          ) : (
+            <Link to="/login" className="rounded-lg p-2 hover:bg-stone-soft"><User size={20} /></Link>
+          )}
         </div>
       </div>
     </header>
