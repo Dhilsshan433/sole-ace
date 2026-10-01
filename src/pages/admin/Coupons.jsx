@@ -3,10 +3,12 @@ import Button from '../../components/Button'
 import Modal from '../../components/Modal'
 import Input from '../../components/Input'
 import api from '../../api/axios'
+import { useToast } from '../../context/ToastContext'
 
 const emptyForm = { code: '', discountType: 'percentage', discountValue: '', minOrderValue: '', expiresAt: '' }
 
 export default function Coupons() {
+  const { showToast } = useToast()
   const [coupons, setCoupons] = useState([])
   const [modal, setModal] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
@@ -36,17 +38,23 @@ export default function Coupons() {
     try {
       if (modal === 'add') await api.post('/coupons', payload)
       else await api.put(`/coupons/${modal._id}`, payload)
+      showToast(modal === 'add' ? 'Coupon added successfully' : 'Changes saved')
       setModal(null)
       load()
     } catch (err) {
-      alert(err.response?.data?.message || 'Could not save coupon')
+      showToast(err.response?.data?.message || 'Could not save coupon', 'error')
     }
   }
 
   const confirmDelete = async () => {
-    await api.delete(`/coupons/${deleteTarget._id}`)
-    setDeleteTarget(null)
-    load()
+    try {
+      await api.delete(`/coupons/${deleteTarget._id}`)
+      showToast('Coupon deleted')
+      setDeleteTarget(null)
+      load()
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Could not delete coupon', 'error')
+    }
   }
 
   const isExpired = (c) => c.expiresAt && new Date(c.expiresAt) < new Date()

@@ -3,8 +3,10 @@ import Button from '../../components/Button'
 import Modal from '../../components/Modal'
 import Input from '../../components/Input'
 import api from '../../api/axios'
+import { useToast } from '../../context/ToastContext'
 
 export default function Brands() {
+  const { showToast } = useToast()
   const [brands, setBrands] = useState([])
   const [modal, setModal] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
@@ -21,17 +23,23 @@ export default function Brands() {
     try {
       if (modal === 'add') await api.post('/brands', { name })
       else await api.put(`/brands/${modal._id}`, { name })
+      showToast(modal === 'add' ? 'Brand added successfully' : 'Changes saved')
       setModal(null)
       load()
     } catch (err) {
-      alert(err.response?.data?.message || 'Could not save brand')
+      showToast(err.response?.data?.message || 'Could not save brand', 'error')
     }
   }
 
   const confirmDelete = async () => {
-    await api.delete(`/brands/${deleteTarget._id}`)
-    setDeleteTarget(null)
-    load()
+    try {
+      await api.delete(`/brands/${deleteTarget._id}`)
+      showToast('Brand deleted')
+      setDeleteTarget(null)
+      load()
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Could not delete brand', 'error')
+    }
   }
 
   return (

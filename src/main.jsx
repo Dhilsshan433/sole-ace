@@ -4,14 +4,20 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext'
+import { ToastProvider } from './context/ToastContext'
+import ErrorBoundary from './components/ErrorBoundary'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
-    <AuthProvider>
-      <CartProvider>
-        <App />
-      </CartProvider>
-    </AuthProvider>  
-  </BrowserRouter>
+  <ErrorBoundary>
+    <BrowserRouter>
+      <AuthProvider>
+        <ToastProvider>
+          <CartProvider>
+            <App />
+          </CartProvider>
+        </ToastProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  </ErrorBoundary>
 )

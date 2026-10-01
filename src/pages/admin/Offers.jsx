@@ -3,10 +3,12 @@ import Button from '../../components/Button'
 import Modal from '../../components/Modal'
 import Input from '../../components/Input'
 import api from '../../api/axios'
+import { useToast } from '../../context/ToastContext'
 
 const emptyForm = { name: '', discountPercent: '', category: '', startsAt: '', endsAt: '' }
 
 export default function Offers() {
+  const { showToast } = useToast()
   const [offers, setOffers] = useState([])
   const [categories, setCategories] = useState([])
   const [modal, setModal] = useState(null)
@@ -40,17 +42,23 @@ export default function Offers() {
     try {
       if (modal === 'add') await api.post('/offers', payload)
       else await api.put(`/offers/${modal._id}`, payload)
+      showToast(modal === 'add' ? 'Offer added successfully' : 'Changes saved')
       setModal(null)
       load()
     } catch (err) {
-      alert(err.response?.data?.message || 'Could not save offer')
+      showToast(err.response?.data?.message || 'Could not save offer', 'error')
     }
   }
 
   const confirmDelete = async () => {
-    await api.delete(`/offers/${deleteTarget._id}`)
-    setDeleteTarget(null)
-    load()
+    try {
+      await api.delete(`/offers/${deleteTarget._id}`)
+      showToast('Offer deleted')
+      setDeleteTarget(null)
+      load()
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Could not delete offer', 'error')
+    }
   }
 
   const statusOf = (o) => {

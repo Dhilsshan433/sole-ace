@@ -3,11 +3,13 @@ import Button from '../../components/Button'
 import Modal from '../../components/Modal'
 import Input from '../../components/Input'
 import api from '../../api/axios'
+import { useToast } from '../../context/ToastContext'
 
 const positions = ['Home top', 'Home middle', 'Deals page']
 const emptyForm = { title: '', image: '', position: 'Home top', linkUrl: '' }
 
 export default function Banners() {
+  const { showToast } = useToast()
   const [banners, setBanners] = useState([])
   const [modal, setModal] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
@@ -24,17 +26,23 @@ export default function Banners() {
     try {
       if (modal === 'add') await api.post('/banners', form)
       else await api.put(`/banners/${modal._id}`, form)
+      showToast(modal === 'add' ? 'Banner added successfully' : 'Changes saved')
       setModal(null)
       load()
     } catch (err) {
-      alert(err.response?.data?.message || 'Could not save banner')
+      showToast(err.response?.data?.message || 'Could not save banner', 'error')
     }
   }
 
   const confirmDelete = async () => {
-    await api.delete(`/banners/${deleteTarget._id}`)
-    setDeleteTarget(null)
-    load()
+    try {
+      await api.delete(`/banners/${deleteTarget._id}`)
+      showToast('Banner deleted')
+      setDeleteTarget(null)
+      load()
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Could not delete banner', 'error')
+    }
   }
 
   return (

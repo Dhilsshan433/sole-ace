@@ -3,6 +3,7 @@ import Button from '../../components/Button'
 import Modal from '../../components/Modal'
 import Input from '../../components/Input'
 import api from '../../api/axios'
+import { useToast } from '../../context/ToastContext'
 
 const emptyForm = {
   name: '', brand: '', category: '', price: '', oldPrice: '', description: '',
@@ -10,10 +11,11 @@ const emptyForm = {
 }
 
 export default function Products() {
+  const { showToast } = useToast()
   const [products, setProducts] = useState([])
   const [brands, setBrands] = useState([])
   const [categories, setCategories] = useState([])
-  const [modal, setModal] = useState(null) // 'add' | product object
+  const [modal, setModal] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [form, setForm] = useState(emptyForm)
   const [loading, setLoading] = useState(true)
@@ -67,17 +69,23 @@ export default function Products() {
     try {
       if (modal === 'add') await api.post('/products', payload)
       else await api.put(`/products/${modal._id}`, payload)
+      showToast(modal === 'add' ? 'Product added successfully' : 'Changes saved')
       setModal(null)
       load()
     } catch (err) {
-      alert(err.response?.data?.message || 'Could not save product')
+      showToast(err.response?.data?.message || 'Could not save product', 'error')
     }
   }
 
   const confirmDelete = async () => {
-    await api.delete(`/products/${deleteTarget._id}`)
-    setDeleteTarget(null)
-    load()
+    try {
+      await api.delete(`/products/${deleteTarget._id}`)
+      showToast('Product deleted')
+      setDeleteTarget(null)
+      load()
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Could not delete product', 'error')
+    }
   }
 
   const stockLabel = (p) => {

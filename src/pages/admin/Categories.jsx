@@ -3,10 +3,12 @@ import Button from '../../components/Button'
 import Modal from '../../components/Modal'
 import Input from '../../components/Input'
 import api from '../../api/axios'
+import { useToast } from '../../context/ToastContext'
 
 export default function Categories() {
+  const { showToast } = useToast()
   const [categories, setCategories] = useState([])
-  const [modal, setModal] = useState(null) // 'add' | category object
+  const [modal, setModal] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(true)
@@ -21,17 +23,23 @@ export default function Categories() {
     try {
       if (modal === 'add') await api.post('/categories', { name })
       else await api.put(`/categories/${modal._id}`, { name })
+      showToast(modal === 'add' ? 'Category added successfully' : 'Changes saved')
       setModal(null)
       load()
     } catch (err) {
-      alert(err.response?.data?.message || 'Could not save category')
+      showToast(err.response?.data?.message || 'Could not save category', 'error')
     }
   }
 
   const confirmDelete = async () => {
-    await api.delete(`/categories/${deleteTarget._id}`)
-    setDeleteTarget(null)
-    load()
+    try {
+      await api.delete(`/categories/${deleteTarget._id}`)
+      showToast('Category deleted')
+      setDeleteTarget(null)
+      load()
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Could not delete category', 'error')
+    }
   }
 
   return (

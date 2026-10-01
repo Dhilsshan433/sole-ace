@@ -11,9 +11,23 @@ export default function SignUp() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const validate = () => {
+    if (form.name.trim().length < 2) return 'Please enter your full name'
+    if (!/^\S+@\S+\.\S+$/.test(form.email)) return 'Please enter a valid email'
+    if (form.phone.replace(/\D/g, '').length < 10) return 'Please enter a valid phone number'
+    if (form.password.length < 6) return 'Password must be at least 6 characters'
+    return ''
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setError(''); setLoading(true)
+    const validationError = validate()
+    if (validationError) {
+      setError(validationError)
+      return
+    }
+    setError('')
+    setLoading(true)
     try {
       await api.post('/auth/signup', form)
       navigate('/signup/otp', { state: { email: form.email } })
@@ -27,16 +41,40 @@ export default function SignUp() {
   return (
     <AuthCard title="Create your account" subtitle="Join SOLE ACE for faster checkout and order tracking.">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Input label="Full name" placeholder="Your name" required
-          value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-        <Input label="Email" type="email" placeholder="you@example.com" required
-          value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-        <Input label="Phone" placeholder="+91 98765 43210" required
-          value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-        <Input label="Password" type="password" placeholder="Create a password" required
-          value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+        <Input
+          label="Full name"
+          placeholder="Your name"
+          required
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+        />
+        <Input
+          label="Email"
+          type="email"
+          placeholder="you@example.com"
+          required
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+        />
+        <Input
+          label="Phone"
+          placeholder="+91 98765 43210"
+          required
+          value={form.phone}
+          onChange={(e) => setForm({ ...form, phone: e.target.value })}
+        />
+        <Input
+          label="Password"
+          type="password"
+          placeholder="Create a password"
+          required
+          value={form.password}
+          onChange={(e) => setForm({ ...form, password: e.target.value })}
+        />
         {error && <p className="text-sm text-red-500">{error}</p>}
-        <Button type="submit" full disabled={loading}>{loading ? 'Creating account…' : 'Create account'}</Button>
+        <Button type="submit" full disabled={loading}>
+          {loading ? 'Creating account…' : 'Create account'}
+        </Button>
       </form>
       <p className="text-center text-sm text-muted">
         Already have an account? <Link to="/login" className="font-semibold text-accent">Log in</Link>
