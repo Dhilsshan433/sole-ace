@@ -3,10 +3,11 @@ import Button from '../../components/Button'
 import ProductCard from '../../components/ProductCard'
 import { useProducts } from '../../hooks/useProducts'
 
-const { products } = useProducts()
 const categories = ['Sneakers', 'Running', 'Formal', 'Sandals', 'Boots', 'Kids']
 
 export default function Home() {
+  const { products } = useProducts()
+
   return (
     <div className="space-y-16">
       <section className="flex flex-col items-center gap-10 rounded-3xl bg-ink p-10 text-white md:flex-row md:p-16">

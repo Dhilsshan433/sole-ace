@@ -63,6 +63,9 @@ import AdminCategories from './pages/admin/Categories'
 import AdminBrands from './pages/admin/Brands'
 import AdminOrders from './pages/admin/Orders'
 import AdminOrderDetails from './pages/admin/OrderDetails'
+import AdminCoupons from './pages/admin/Coupons'
+import AdminOffers from './pages/admin/Offers'
+import AdminBanners from './pages/admin/Banners'
 
 export default function App() {
   return (
@@ -138,6 +141,9 @@ export default function App() {
         <Route path="products" element={<AdminProducts />} />
         <Route path="categories" element={<AdminCategories />} />
         <Route path="brands" element={<AdminBrands />} />
+        <Route path="coupons" element={<AdminCoupons />} />
+        <Route path="offers" element={<AdminOffers />} />
+        <Route path="banners" element={<AdminBanners />} />
         <Route path="orders" element={<AdminOrders />} />
         <Route path="orders/:id" element={<AdminOrderDetails />} />
       </Route>
