@@ -11,6 +11,9 @@ const links = [
   ['Coupons', '/admin/coupons'],
   ['Offers', '/admin/offers'],
   ['Banners', '/admin/banners'],
+  ['Reviews', '/admin/reviews'],
+  ['Support', '/admin/support'],
+  ['Referral', '/admin/referral'],
 ]
 
 export default function AdminLayout() {

@@ -66,6 +66,10 @@ import AdminOrderDetails from './pages/admin/OrderDetails'
 import AdminCoupons from './pages/admin/Coupons'
 import AdminOffers from './pages/admin/Offers'
 import AdminBanners from './pages/admin/Banners'
+import AdminSupport from './pages/admin/Support'
+import AdminTicketDetails from './pages/admin/AdminTicketDetails'
+import AdminReviews from './pages/admin/Reviews'
+import AdminReferral from './pages/admin/Referral'
 
 export default function App() {
   return (
@@ -146,6 +150,10 @@ export default function App() {
         <Route path="banners" element={<AdminBanners />} />
         <Route path="orders" element={<AdminOrders />} />
         <Route path="orders/:id" element={<AdminOrderDetails />} />
+        <Route path="support" element={<AdminSupport />} />
+        <Route path="support/:id" element={<AdminTicketDetails />} />
+        <Route path="reviews" element={<AdminReviews />} />
+        <Route path="referral" element={<AdminReferral />} />
       </Route>
 
       {/* 404 — must stay last */}

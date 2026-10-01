@@ -14,6 +14,8 @@ import userRoutes from './routes/userRoutes.js'
 import couponRoutes from './routes/couponRoutes.js'
 import offerRoutes from './routes/offerRoutes.js'
 import bannerRoutes from './routes/bannerRoutes.js'
+import reviewRoutes from './routes/reviewRoutes.js'
+import supportRoutes from './routes/supportRoutes.js'
 
 
 dotenv.config()
@@ -34,6 +36,9 @@ app.use('/api/orders', orderRoutes)
 app.use('/api/coupons', couponRoutes)
 app.use('/api/offers', offerRoutes)
 app.use('/api/banners', bannerRoutes)
+
+app.use('/api/reviews', reviewRoutes)
+app.use('/api/support', supportRoutes)
 
 app.use('/api/users', userRoutes)
 
