@@ -11,8 +11,35 @@ export default function Checkout() {
   const navigate = useNavigate()
   const [payment, setPayment] = useState('upi')
   const [placing, setPlacing] = useState(false)
+  const [couponInput, setCouponInput] = useState('')
+  const [applying, setApplying] = useState(false)
+  const [couponError, setCouponError] = useState('')
+  const [appliedCoupon, setAppliedCoupon] = useState(null) // { code, discount }
 
   const defaultAddress = user?.addresses?.find((a) => a.isDefault) || user?.addresses?.[0]
+  const discount = appliedCoupon?.discount || 0
+  const total = Math.max(subtotal - discount, 0)
+
+  const applyCoupon = async () => {
+    if (!couponInput.trim()) return
+    setApplying(true)
+    setCouponError('')
+    try {
+      const res = await api.post('/coupons/validate', { code: couponInput, subtotal })
+      setAppliedCoupon({ code: res.data.code, discount: res.data.discount })
+    } catch (err) {
+      setAppliedCoupon(null)
+      setCouponError(err.response?.data?.message || 'Invalid coupon code')
+    } finally {
+      setApplying(false)
+    }
+  }
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null)
+    setCouponInput('')
+    setCouponError('')
+  }
 
   const placeOrder = async () => {
     if (!defaultAddress) return
@@ -36,6 +63,7 @@ export default function Checkout() {
           pincode: defaultAddress.pincode,
         },
         paymentMethod: payment,
+        couponCode: appliedCoupon?.code,
       }
       await api.post('/orders', payload)
       clearCart()
@@ -97,17 +125,44 @@ export default function Checkout() {
 
         <div className="h-fit space-y-4 rounded-2xl border border-stone-line p-6">
           <h2 className="text-lg font-semibold">Order summary</h2>
+
+          {appliedCoupon ? (
+            <div className="flex items-center justify-between rounded-xl bg-green-50 px-4 py-3 text-sm">
+              <span className="font-semibold text-green-700">{appliedCoupon.code} applied</span>
+              <button onClick={removeCoupon} className="font-medium text-red-500">Remove</button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <input
+                value={couponInput}
+                onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                placeholder="Coupon code"
+                className="flex-1 rounded-xl border border-stone-line px-4 py-2.5 text-sm outline-none focus:border-ink"
+              />
+              <Button variant="dark" onClick={applyCoupon} disabled={applying}>
+                {applying ? 'Checking…' : 'Apply'}
+              </Button>
+            </div>
+          )}
+          {couponError && <p className="text-xs text-red-500">{couponError}</p>}
+
           <div className="flex justify-between text-sm">
             <span className="text-muted">Subtotal ({items.length} items)</span>
             <span>₹{subtotal.toLocaleString('en-IN')}</span>
           </div>
+          {discount > 0 && (
+            <div className="flex justify-between text-sm">
+              <span className="text-muted">Discount</span>
+              <span className="text-green-600">−₹{discount.toLocaleString('en-IN')}</span>
+            </div>
+          )}
           <div className="flex justify-between text-sm">
             <span className="text-muted">Shipping</span>
             <span>Free</span>
           </div>
           <div className="flex justify-between border-t border-stone-line pt-3 font-semibold">
             <span>Total</span>
-            <span>₹{subtotal.toLocaleString('en-IN')}</span>
+            <span>₹{total.toLocaleString('en-IN')}</span>
           </div>
           <Button full onClick={placeOrder} disabled={placing || items.length === 0 || !defaultAddress}>
             {placing ? 'Placing order…' : 'Place order'}

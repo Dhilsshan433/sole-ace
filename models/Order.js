@@ -13,6 +13,8 @@ const orderSchema = new mongoose.Schema({
   },
   paymentMethod: { type: String, enum: ['upi', 'card', 'cod'], required: true },
   subtotal: { type: Number, required: true },
+  discount: { type: Number, default: 0 },
+  couponCode: { type: String },
   total: { type: Number, required: true },
   status: { type: String, enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled'], default: 'Processing' },
   paymentStatus: { type: String, enum: ['Pending', 'Paid', 'Failed'], default: 'Pending' },

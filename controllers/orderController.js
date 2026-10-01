@@ -1,21 +1,34 @@
 import Order from '../models/Order.js'
 import Product from '../models/Product.js'
+import Coupon from '../models/Coupon.js'
 
 // POST /api/orders
 export async function createOrder(req, res) {
   try {
-    const { items, address, paymentMethod } = req.body
+    const { items, address, paymentMethod, couponCode } = req.body
     if (!items?.length) return res.status(400).json({ message: 'Cart is empty' })
 
     const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0)
+    let discount = 0
+
+    if (couponCode) {
+      const coupon = await Coupon.findOne({ code: couponCode.toUpperCase(), isActive: true })
+      if (coupon && (!coupon.expiresAt || coupon.expiresAt > new Date()) && subtotal >= coupon.minOrderValue) {
+        discount = coupon.discountType === 'percentage' ? Math.round((subtotal * coupon.discountValue) / 100) : coupon.discountValue
+        coupon.usedCount += 1
+        await coupon.save()
+      }
+    }
+
+    const total = Math.max(subtotal - discount, 0)
 
     const order = await Order.create({
       user: req.user._id, items, address, paymentMethod,
-      subtotal, total: subtotal,
+      subtotal, discount, couponCode: discount > 0 ? couponCode?.toUpperCase() : undefined,
+      total,
       paymentStatus: paymentMethod === 'cod' ? 'Pending' : 'Paid',
     })
 
-    // reduce stock for each purchased size/color variant
     for (const item of items) {
       await Product.updateOne(
         { _id: item.product, 'variants.size': item.size },
