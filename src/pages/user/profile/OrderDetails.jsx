@@ -1,24 +1,34 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import Button from '../../../components/Button'
+import ReviewModal from '../../../components/ReviewModal'
 import api from '../../../api/axios'
 
 const colors = { Processing: 'bg-amber-100 text-amber-700', Shipped: 'bg-blue-100 text-blue-700', Delivered: 'bg-green-100 text-green-700', Cancelled: 'bg-red-100 text-red-700' }
 
 export default function OrderDetails() {
   const { id } = useParams()
-  const navigate = useNavigate()
   const [order, setOrder] = useState(null)
+  const [reviewItem, setReviewItem] = useState(null)
+  const [reviewed, setReviewed] = useState({})
 
-  useEffect(() => { api.get(`/orders/${id}`).then((res) => setOrder(res.data)) }, [id])
+  const load = () => api.get(`/orders/${id}`).then((res) => setOrder(res.data))
+  useEffect(() => { load() }, [id])
 
   const cancelOrder = async () => {
     const res = await api.patch(`/orders/${id}/cancel`)
     setOrder(res.data)
   }
 
+  const submitReview = async ({ rating, text }) => {
+    await api.post('/reviews', { product: reviewItem.product, rating, text })
+    setReviewed((prev) => ({ ...prev, [reviewItem.product]: true }))
+    setReviewItem(null)
+  }
+
   if (!order) return <p className="text-muted">Loading…</p>
   const canCancel = order.status === 'Processing'
+  const canReview = order.status === 'Delivered'
 
   return (
     <>
@@ -34,23 +44,45 @@ export default function OrderDetails() {
             {order.items.map((i, idx) => (
               <div key={idx} className="flex items-center gap-3 border-b border-stone-line py-3 last:border-0">
                 <img src={i.image} className="h-14 w-14 rounded-lg bg-stone-soft object-cover" />
-                <div className="flex-1"><p className="text-sm font-semibold">{i.name}</p><p className="text-xs text-muted">Size {i.size} · Qty {i.qty}</p></div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold">{i.name}</p>
+                  <p className="text-xs text-muted">Size {i.size} · Qty {i.qty}</p>
+                </div>
                 <span className="text-sm font-semibold">₹{(i.price * i.qty).toLocaleString('en-IN')}</span>
+                {canReview && (
+                  reviewed[i.product] ? (
+                    <span className="text-xs font-semibold text-green-600">Reviewed</span>
+                  ) : (
+                    <Button variant="outline" onClick={() => setReviewItem(i)}>Write a review</Button>
+                  )
+                )}
               </div>
             ))}
           </div>
           <div className="rounded-2xl border border-stone-line bg-white p-5">
             <h2 className="mb-1 font-semibold">Delivery address</h2>
-            <p className="text-sm text-muted">{order.address?.fullName}, {order.address?.line1}, {order.address?.city}, {order.address?.state} {order.address?.pincode}</p>
+            <p className="text-sm text-muted">
+              {order.address?.fullName}, {order.address?.line1}, {order.address?.city}, {order.address?.state} {order.address?.pincode}
+            </p>
           </div>
         </div>
         <div className="h-fit space-y-3 rounded-2xl border border-stone-line bg-white p-5">
           <h2 className="font-semibold">Order summary</h2>
+          {order.discount > 0 && (
+            <div className="flex justify-between text-sm"><span className="text-muted">Discount</span><span>−₹{order.discount.toLocaleString('en-IN')}</span></div>
+          )}
           <div className="flex justify-between border-t border-stone-line pt-2 font-semibold"><span>Total</span><span>₹{order.total.toLocaleString('en-IN')}</span></div>
           <Link to="/order/tracking"><Button full>Track order</Button></Link>
           {canCancel && <Button full variant="outline" onClick={cancelOrder}>Cancel order</Button>}
         </div>
       </div>
+
+      <ReviewModal
+        open={!!reviewItem}
+        onClose={() => setReviewItem(null)}
+        title={`Review ${reviewItem?.name || ''}`}
+        onSubmit={submitReview}
+      />
     </>
   )
 }
